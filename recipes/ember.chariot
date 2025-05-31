@@ -1,0 +1,32 @@
+source/limine {
+    url: "https://github.com/limine-bootloader/limine.git"
+    type: "git"
+    revision: "v9.x-binary"
+}
+
+source/ember {
+    url: "../ember"
+    type: "local"
+}
+
+package/ember {
+    dependencies: [
+        source/ember
+
+        tool/fabricate
+
+        image/nasm
+        image/clang
+        image/lld
+        image/llvm
+        image/ninja-build
+    ]
+    configure: <sh>
+        fabricate configure \
+            --builddir=$BUILD_DIR \
+            --config=$SOURCES_DIR/ember/fab.lua \
+            --prefix=$PREFIX
+    </sh>
+    build: <sh>fabricate build --builddir=$BUILD_DIR</sh> // TODO: ninja -j?
+    install: <sh>fabricate install --builddir=$BUILD_DIR --destdir=$INSTALL_DIR</sh>
+}
