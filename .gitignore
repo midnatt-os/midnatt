@@ -1,2 +1,5 @@
 .chariot-cache
 .ropeproject
+log.txt
+.luarc.json
+.zed

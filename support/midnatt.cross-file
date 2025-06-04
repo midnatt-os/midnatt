@@ -1,0 +1,13 @@
+[binaries]
+c = 'x86_64-midnatt-gcc'
+cpp = 'x86_64-midnatt-g++'
+ld = 'x86_64-midnatt-ld'
+ar = 'x86_64-midnatt-ar'
+strip = 'x86_64-midnatt-strip'
+pkg-config = 'x86_64-midnatt-pkg-config'
+
+[host_machine]
+system = 'midnatt'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'

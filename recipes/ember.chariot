@@ -19,7 +19,6 @@ package/ember {
         image/clang
         image/lld
         image/llvm
-        image/ninja-build
     ]
     configure: <sh>
         fabricate configure \

@@ -4,13 +4,13 @@ source/init {
 }
 
 package/init {
-    dependencies: [ source/init, image/clang, image/make ]
-    build: <sh>
-        cp -r $SOURCES_DIR/init/* .
-        make init
+    dependencies: [ source/init, tool/gcc, package/mlibc_headers, tool/fabricate ]
+    configure: <sh>
+        fabricate configure \
+            --builddir=$BUILD_DIR \
+            --config=$SOURCES_DIR/init/fab.lua \
+            --prefix=$PREFIX
     </sh>
-    install: <sh>
-        install -d $INSTALL_DIR$PREFIX/bin
-        install init $INSTALL_DIR$PREFIX/bin
-    </sh>
+    build: <sh>fabricate build --builddir=$BUILD_DIR</sh> // TODO: ninja -j?
+    install: <sh>fabricate install --builddir=$BUILD_DIR --destdir=$INSTALL_DIR</sh>
 }
