@@ -1,0 +1,21 @@
+source/doomwad {
+    url: "/home/vincent/projects/doomgeneric",
+    type: "local"
+}
+
+source/doom {
+    url: "/home/vincent/projects/doomgeneric/doomgeneric"
+    type: "local"
+}
+
+package/doom {
+    dependencies: [ source/doom, source/doomwad tool/gcc, image/make ]
+    build: <sh>
+        cp -r $SOURCES_DIR/doom/* .
+        make OBJDIR=$BUILD_DIR PREFIX=$INSTALL_DIR$PREFIX
+    </sh>
+    install: <sh>
+        make install PREFIX=$INSTALL_DIR$PREFIX
+        cp $SOURCES_DIR/doomwad/doom.wad $INSTALL_DIR$PREFIX/doom.wad
+    </sh>
+}

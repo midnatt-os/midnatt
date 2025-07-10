@@ -14,3 +14,104 @@ package/init {
     build: <sh>fabricate build --builddir=$BUILD_DIR</sh> // TODO: ninja -j?
     install: <sh>fabricate install --builddir=$BUILD_DIR --destdir=$INSTALL_DIR</sh>
 }
+
+source/test {
+    url: "test"
+    type: "local"
+}
+
+package/test {
+    dependencies: [ source/test, tool/gcc, package/mlibc_headers, tool/fabricate ]
+    configure: <sh>
+        fabricate configure \
+            --builddir=$BUILD_DIR \
+            --config=$SOURCES_DIR/test/fab.lua \
+            --prefix=$PREFIX
+    </sh>
+    build: <sh>fabricate build --builddir=$BUILD_DIR</sh> // TODO: ninja -j?
+    install: <sh>fabricate install --builddir=$BUILD_DIR --destdir=$INSTALL_DIR</sh>
+}
+
+source/ncurses {
+    url: "https://github.com/ThomasDickey/ncurses-snapshots/archive/refs/tags/v6_5_20250426.tar.gz"
+    type: "tar.gz"
+    b2sum: "a6161e5de4d84f275ddab1fba500b1d383c9f8ab60628ceb7f5875e76b53c36d2689754fbc51ca46d3a61fa675d5592d959a11abcda0d6daf34ea30d65b7bbf2"
+    patch: "patches/ncurses.diff"
+}
+
+package/ncurses {
+    dependencies: [ source/ncurses, tool/gcc, collection/autotools_2.69, image/build-essential, image/gcc ]
+    configure: <sh>
+        $SOURCES_DIR/ncurses/configure \
+            --host=x86_64-midnatt \
+            --build=$($SOURCES_DIR/ncurses/config.guess) \
+            --prefix=$PREFIX \
+            --enable-widec \
+            --without-normal \
+            --with-shared \
+            --without-ada \
+            --without-cxx-bindings \
+    </sh>
+    build: <sh>make</sh>
+    install: <sh>
+        make install DESTDIR=$INSTALL_DIR
+        cd $INSTALL_DIR$PREFIX/lib
+        ln -svf libncursesw.so libncurses.so
+    </sh>
+}
+
+source/readline {
+    url: "https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz"
+    type: "tar.gz"
+    b2sum: "7974322b9c092a756a79e537df08e8532f8e0fcb598f77732e28287c33ebec9e9837ed88b43334c310892d56a871b423903f0f564def2fbe700a1004f2ae7b18"
+    patch: "patches/readline.diff"
+}
+
+package/readline {
+    dependencies: [ source/readline, *package/ncurses tool/gcc, collection/autotools_2.69 ]
+    configure: <sh>
+        CC=x86_64-midnatt-gcc \
+        $SOURCES_DIR/readline/configure \
+            --host=x86_64-midnatt \
+            --build=$($SOURCES_DIR/readline/support/config.guess) \
+            --prefix=$PREFIX \
+            --with-curses \
+            --enable-shared \
+            --enable-multibyte
+    </sh>
+    build: <sh>make</sh>
+    install: <sh>make install DESTDIR=$INSTALL_DIR</sh>
+}
+
+source/bash {
+    url: "https://ftp.gnu.org/gnu/bash/bash-5.2.tar.gz"
+    type: "tar.gz"
+    b2sum: "51b196e710794ebad8eac28c31c93eb99ac1a7db30919a13271e39e1cb66a0672f242df75fc7d71627ea873dfbce53ec35c0c56a71c5167143070a7811343fd9"
+    patch: "patches/bash.diff"
+}
+
+package/bash {
+    dependencies: [ %source/bash, tool/binutils, tool/gcc, collection/autotools_2.69, image/build-essential, package/readline ]
+    configure: <sh>
+        CC=x86_64-midnatt-gcc \
+        CFLAGS="-g -O0 -DDEBUG" \
+        $SOURCES_DIR/bash/configure \
+            --build=$($SOURCES_DIR/bash/support/config.guess) \
+            --host=x86_64-midnatt \
+            --disable-nls \
+            --without-bash-malloc \
+            --without-readline \
+            --prefix=$PREFIX \
+            bash_cv_func_sigsetjmp=no \
+            bash_cv_getcwd_malloc=yes \
+            bash_cv_func_strcoll_broken=no \
+            ac_cv_func_working_mktime=yes \
+            #--enable-readline \
+            #--with-curses \
+            #--disable-job-control \
+            #bash_cv_job_control_missing=yes \
+            #--with-installed-readline="$SYSROOT_DIR$PREFIX" \
+    </sh>
+    build: <sh>make</sh>
+    install: <sh>make install DESTDIR=$INSTALL_DIR</sh>
+}

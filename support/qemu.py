@@ -10,6 +10,8 @@ OVMF_PATH = "/usr/share/ovmf/x64/OVMF.4m.fd"
 chariot_recipes = [
     "source/ember",
     "source/init",
+    "source/test",
+    #"source/doom",
     "custom/image"
 ]
 
@@ -28,7 +30,7 @@ qemu_args = [
     "-s",
     "-no-reboot",
     "-no-shutdown",
-    "-display", "none",
+    #"-display", "none",
     "-drive", f"format=raw,file={chariot_utils.path("custom/image")}/ember.img",
     "-drive", f"if=pflash,unit=0,format=raw,file={OVMF_PATH},readonly=on"
 ]

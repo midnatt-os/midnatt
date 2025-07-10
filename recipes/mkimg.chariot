@@ -1,5 +1,5 @@
 source/mkimg {
-    url: "https://github.com/elysium-os/mkimg"
+    url: "https://github.com/elysium-os/fabricate.git"
     revision: "3ee31fc7dd370fb68a9da52e271ef78a97de5012"
     type: "git"
 }

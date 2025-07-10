@@ -11,6 +11,8 @@
 @import "recipes/toolchain/gcc.chariot"
 @import "recipes/toolchain/pkgconf.chariot"
 
+@import "recipes/ports/doom.chariot"
+
 @env "CLICOLOR_FORCE" = "1"
 
 
@@ -29,7 +31,7 @@ EOF
 }
 
 custom/initrd {
-    dependencies: [ package/init ]
+    dependencies: [ package/init, package/test, package/bash, package/mlibc, package/ncurses, package/doom ]
     configure: <sh>rm -rf $BUILD_DIR/*</sh>
     build: <py>
 import os

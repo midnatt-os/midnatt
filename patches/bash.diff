@@ -1,0 +1,23 @@
+diff -Naru bash-5.2-orig/support/config.sub bash-5.2/support/config.sub
+--- bash-5.2-orig/support/config.sub	2025-06-26 23:40:44.106146307 +0200
++++ bash-5.2/support/config.sub	2025-06-26 23:47:07.432370653 +0200
+@@ -1350,6 +1350,9 @@
+ # Now, normalize the OS (knowing we just have one component, it's not a kernel,
+ # etc.)
+ case $os in
++    midnatt*)
++        os=midnatt
++        ;;
+ 	# First match some system type aliases that might get confused
+ 	# with valid system types.
+ 	# solaris* is a basic system type, with this one exception.
+@@ -1711,6 +1714,9 @@
+ 
+ # Now, validate our (potentially fixed-up) OS.
+ case $os in
++    midnatt*)
++        os=midnatt
++        ;;
+ 	# Sometimes we do "kernel-libc", so those need to count as OSes.
+ 	musl* | newlib* | relibc* | uclibc*)
+ 		;;

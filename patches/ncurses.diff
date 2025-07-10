@@ -1,0 +1,27 @@
+diff -Naru ncurses-6.5/config.sub ncurses-6.5-patched/config.sub
+--- ncurses-6.5/config.sub	2023-12-27 15:41:27.000000000 +0100
++++ ncurses-6.5-patched/config.sub	2025-06-29 16:13:24.207097291 +0200
+@@ -1722,6 +1722,9 @@
+ # Now, validate our (potentially fixed-up) individual pieces (OS, OBJ).
+ 
+ case $os in
++    midnatt*)
++        ;;
++
+ 	# Sometimes we do "kernel-libc", so those need to count as OSes.
+ 	llvm* | musl* | newlib* | relibc* | uclibc*)
+ 		;;
+diff -Naru ncurses-6.5/configure ncurses-6.5-patched/configure
+--- ncurses-6.5/configure	2024-04-10 10:09:48.000000000 +0200
++++ ncurses-6.5-patched/configure	2025-06-29 16:07:57.429423082 +0200
+@@ -6925,6 +6925,10 @@
+ 		LINK_PROGS="$SHELL ${rel_builddir}/mk_prog.sh"
+ 		LINK_TESTS="$SHELL ${rel_builddir}/mk_prog.sh"
+ 		;;
++	(midnatt*)
++		CC_SHARED_OPTS='-fPIC'
++		MK_SHARED_LIB='${CC} -shared -o $@'
++		;;
+ 	(mingw*)
+ 		cf_cv_shlib_version=mingw
+ 		cf_cv_shlib_version_infix=mingw

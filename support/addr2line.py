@@ -15,6 +15,6 @@ address = int(sys.argv[1], 16)
 
 subprocess.run([
     "addr2line", "-fai",
-    "-e", os.path.join(chariot_utils.path("package/init"), "usr/bin/init"),
+    "-e", os.path.join(chariot_utils.path("package/ember"), "usr/bin/ember.elf"),
     hex(address)
 ])

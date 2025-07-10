@@ -4,7 +4,7 @@ local c_flags = {
     "-I" .. "/chariot/sysroot/usr/include", -- TODO: Janky af.
 
     "-std=gnu2x",
-    "-O0",
+    "-static -O0",
     "-g",
 
     "-Wall ",
@@ -15,15 +15,6 @@ local c_flags = {
     "-Wno-unused-function",
     "-Wno-unused-parameter"
 }
-
-local flanterm = fab.dependency(
-    "flanterm",
-    "https://codeberg.org/mintsuki/flanterm.git",
-    "trunk"
-)
-
-table.extend(c_sources, sources(flanterm:glob("**/*.c")))
-table.insert(c_flags, "-I" .. path(flanterm.path, "src"))
 
 local c_compiler = fab.find_executable("x86_64-midnatt-gcc")
 if c_compiler == nil then
@@ -37,6 +28,6 @@ local rule = fab.rule({
     compdb = true
 })
 
-local init_elf = rule:build("init", c_sources, { args = table.join(c_flags, " ") })
+local test_elf = rule:build("test", c_sources, { args = table.join(c_flags, " ") })
 
-init_elf:install("bin/init")
+test_elf:install("bin/test")
