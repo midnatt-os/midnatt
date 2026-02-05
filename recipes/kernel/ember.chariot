@@ -1,0 +1,47 @@
+source/ember {
+    url: "https://github.com/midnatt-os/ember"
+    type: "git"
+    revision: "master"
+}
+
+package/ember {
+    dependencies: [
+        source/ember
+
+        source/freestanding_c_headers
+        source/cc_runtime
+        source/limine_proto
+        source/uacpi
+        source/nanoprintf
+        source/flanterm
+
+        tool/fabricate
+
+
+        image/nasm
+        image/clang
+        image/lld
+        image/llvm
+        image/ninja-build
+    ]
+    options: [ "logging" ]
+
+    configure: <sh>
+        fabricate --build-dir=$BUILD_DIR setup \
+            --config=$SOURCES_DIR/ember/fab.lua \
+            --prefix=/sys \
+            --dependency-override=freestanding-c-headers=$SOURCES_DIR/freestanding_c_headers \
+            --dependency-override=cc-runtime=$SOURCES_DIR/cc_runtime \
+            --dependency-override=limine-proto=$SOURCES_DIR/limine_proto \
+            --dependency-override=uacpi=$SOURCES_DIR/uacpi \
+            --dependency-override=nanoprintf=$SOURCES_DIR/nanoprintf \
+            --dependency-override=flanterm=$SOURCES_DIR/flanterm \
+            --option=logging=$OPTION_logging
+    </sh>
+    build: <sh>
+        ninja -j$PARALLELISM
+    </sh>
+    install: <sh>
+        fabricate --build-dir=$BUILD_DIR install --dest-dir=$INSTALL_DIR
+    </sh>
+}

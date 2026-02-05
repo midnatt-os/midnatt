@@ -1,0 +1,20 @@
+source/init {
+    url: "init"
+    type: "local"
+}
+
+package/init {
+    dependencies: [ source/init tool/gcc tool/fabricate image/ninja-build image/nasm image/clang ]
+    configure: <sh>
+        fabricate setup \
+            --build-dir=$BUILD_DIR \
+            --config=$SOURCES_DIR/init/fab.lua \
+            --prefix=$PREFIX \
+    </sh>
+    build: <sh>
+        ninja -j$PARALLELISM
+    </sh>
+    install: <sh>
+        fabricate --build-dir=$BUILD_DIR install --dest-dir=$INSTALL_DIR
+    </sh>
+}

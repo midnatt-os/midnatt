@@ -1,0 +1,5 @@
+source/flanterm {
+    url: "https://codeberg.org/mintsuki/flanterm.git",
+    type: "git"
+    revision: "trunk"
+}

@@ -1,0 +1,5 @@
+source/nanoprintf {
+    url: "https://github.com/charlesnicholson/nanoprintf.git"
+    type: "git"
+    revision: "main"
+}

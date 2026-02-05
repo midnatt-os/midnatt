@@ -1,10 +1,10 @@
+local c = require("lang_c")
+
 local c_sources = sources(fab.glob("**/*.c"))
 
-local c_flags = {
-    "-I" .. "/chariot/sysroot/usr/include", -- TODO: Janky af.
-
+local flags = {
     "-std=gnu2x",
-    "-static -O0",
+    "-O0",
     "-g",
 
     "-Wall ",
@@ -16,18 +16,13 @@ local c_flags = {
     "-Wno-unused-parameter"
 }
 
-local c_compiler = fab.find_executable("x86_64-midnatt-gcc")
-if c_compiler == nil then
-    error("x86_64-midnatt-gcc not found")
-end
+local cc = c.get_gcc("x86_64-midnatt-gcc")
+assert(cc ~= nil, "x86_64-midnatt-gcc not found")
 
-local rule = fab.rule({
-    name = "compile-c",
-    description = "compiling c program @OUT@",
-    command = { c_compiler, "@ARGS@", "-o", "@OUT@", "@IN@" },
-    compdb = true
-})
+local init = cc:compile("init", c_sources, flags)
 
-local init_elf = rule:build("init", c_sources, { args = table.join(c_flags, " ") })
-
-init_elf:install("bin/init")
+return {
+    install = {
+        ["/usr/bin/init"] = init
+    }
+}

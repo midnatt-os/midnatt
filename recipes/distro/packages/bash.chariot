@@ -1,0 +1,37 @@
+source/bash {
+    url: "https://ftpmirror.gnu.org/gnu/bash/bash-5.1.tar.gz"
+    type: "tar.gz"
+    b2sum: "42059556694b604911b5b7936f94d42d8923f2931f3ebacefd95454274c7baadb1ec97629a524c1542e2e282dae66f1389334f8edc572ca8ee841cc3ac449ba7"
+    patch: "patches/bash.diff"
+}
+
+package/bash {
+    dependencies: [
+        source/bash
+
+        *package/readline
+
+        tool/binutils
+        tool/gcc
+        collection/autotools_2.69
+        image/build-essential
+    ]
+    configure: <sh>
+        CC=x86_64-midnatt-gcc \
+        CFLAGS="-g -O0 -DDEBUG" \
+        $SOURCES_DIR/bash/configure \
+            --host=x86_64-midnatt \
+            --prefix=$PREFIX \
+            --disable-nls \
+            --without-bash-malloc \
+            --enable-readline \
+            --with-installed-readline \
+            #bash_cv_func_sigsetjmp=no \
+            #bash_cv_getcwd_malloc=yes \
+            #bash_cv_func_strcoll_broken=no \
+            #ac_cv_func_working_mktime=yes \
+            #bash_cv_job_control_missing=yes \
+    </sh>
+    build: <sh>make</sh>
+    install: <sh>make install DESTDIR=$INSTALL_DIR</sh>
+}

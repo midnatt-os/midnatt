@@ -1,5 +1,5 @@
 source/gcc_host {
-    url: "https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.gz"
+    url: "https://mirror.elysium-os.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.gz"
     b2sum: "7d429d2803b88d8cc9da460fd3a0bd0b888fbe0cc0338e7ed04c71599bd87b475836c8a8fb563338ee0f83e2b4d988427c063ae6c2bd0fc3ab30b07a4e9e7cd0"
     type: "tar.gz"
     patch: "patches/gcc-host.diff"
@@ -72,9 +72,11 @@ tool/gcc {
         export PATH="$PATH:/usr/bin/core_perl"
         make -j$PARALLELISM all-gcc
         make -j$PARALLELISM all-target-libgcc
+        make -j$PARALLELISM all-target-libstdc++-v3
     </sh>
     install: <sh>
         DESTDIR=$INSTALL_DIR make install-gcc
         DESTDIR=$INSTALL_DIR make install-target-libgcc
+        DESTDIR=$INSTALL_DIR make install-target-libstdc++-v3
     </sh>
 }

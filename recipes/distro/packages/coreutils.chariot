@@ -1,0 +1,24 @@
+source/coreutils {
+    url: "https://ftpmirror.gnu.org/gnu/coreutils/coreutils-9.1.tar.xz"
+    type: "tar.xz"
+    b2sum: "f5654e4935535275615d44a56c071d1c0746af36cf4615fcc0a5a0d387af9c9023adac31f31a52e16b3d1105b9d4c0fb7ebff9b2862498849f867a866049dd6e"
+    dependencies: [ tool/reconfigure collection/autotools_2.69 ]
+    regenerate: <sh>autoreconf -fvi</sh>
+    patch: "patches/coreutils.diff"
+}
+
+package/coreutils {
+    dependencies: [
+        source/coreutils
+
+        tool/gcc
+    ]
+    configure: <sh>
+        CFLAGS="-DSLOW_BUT_NO_HACKS" \
+        $SOURCES_DIR/coreutils/configure \
+            --host=x86_64-midnatt \
+            --prefix=$PREFIX
+    </sh>
+    build: <sh>make -j${parallelism}</sh>
+    install: <sh>make install DESTDIR=$INSTALL_DIR</sh>
+}

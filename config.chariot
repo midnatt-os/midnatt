@@ -1,79 +1,58 @@
-@import "recipes/fabricate.chariot"
-@import "recipes/mkimg.chariot"
-@import "recipes/symfgen.chariot"
-@import "recipes/ember.chariot"
-@import "recipes/init.chariot"
-
-@import "recipes/toolchain/freestanding_headers.chariot"
-@import "recipes/toolchain/mlibc.chariot"
-@import "recipes/toolchain/autotools.chariot"
-@import "recipes/toolchain/binutils.chariot"
-@import "recipes/toolchain/gcc.chariot"
-@import "recipes/toolchain/pkgconf.chariot"
+@import "recipes/**/*.chariot"
 
 @env "CLICOLOR_FORCE" = "1"
 
-
-
-tool/reconfigure {
-    install: <sh>
-        mkdir -p $INSTALL_DIR$PREFIX/bin
-        cat << EOF > $INSTALL_DIR$PREFIX/bin/reconfigure.sh
-        for f in \$(find . -name configure.ac -o -name configure.in -type f | sort); do
-            echo "* autotools regen in '\$(dirname \$f)'..."
-            ( cd "\$(dirname "\$f")" && autoreconf -fvi "\$@" )
-        done
-EOF
-        chmod +x $INSTALL_DIR$PREFIX/bin/reconfigure.sh
-    </sh>
-}
-
-custom/initrd {
-    dependencies: [ package/init ]
-    configure: <sh>rm -rf $BUILD_DIR/*</sh>
-    build: <py>
-import os
-import shutil
-import tarfile
-
-shutil.copytree(f"{os.environ["SYSROOT_DIR"]}", "initrd/")
-
-with tarfile.open("midnatt.initrd.tar", "w", format=tarfile.USTAR_FORMAT) as tar:
-    for entry in os.listdir("initrd"):
-        tar.add("initrd/" + entry, arcname=entry)
-    </py>
-    install: <sh>install -D midnatt.initrd.tar $INSTALL_DIR</sh>
-}
+@option "logging" = [ "serial", "fb", "all" ]
 
 source/support {
     url: "support"
     type: "local"
 }
 
+custom/initrd {
+    dependencies: [
+        package/mlibc
+
+        package/init
+        package/bash
+    ]
+    build: <sh>
+        cd "$SYSROOT_DIR"
+        find . -print0 | cpio --null -ov -H newc > $BUILD_DIR/initrd.cpio
+    </sh>
+    install: <sh>
+        install ./initrd.cpio $INSTALL_DIR
+    </sh>
+}
+
 custom/image {
     dependencies: [
-        source/limine
         source/support
-
-        tool/mkimg
-        tool/symfgen
-
-        package/ember
+        source/limine_binary
 
         custom/initrd
+
+        tool/mkimg
+
+        package/ember
     ]
     configure: <sh>rm -rf $BUILD_DIR/*</sh>
     build: <sh>
         mkdir -p efi_root/EFI/BOOT
 
-        install $SOURCES_DIR/limine/BOOTX64.EFI efi_root/EFI/BOOT/
+        install $SOURCES_DIR/limine_binary/BOOTX64.EFI efi_root/EFI/BOOT/
         install $SOURCES_DIR/support/limine.conf efi_root/
-        install $SYSROOT_DIR/usr/bin/ember.elf efi_root/
+        install $SYSROOT_DIR/sys/bin/ember efi_root/
+        install $SYSROOT_DIR/sys/modules/firework_test.mod efi_root/
 
-        install $CUSTOM_DIR/initrd/midnatt.initrd.tar efi_root/
-        sym_gen $SYSROOT_DIR/usr/bin/ember.elf efi_root/ember_symbols.symf
+        install $CUSTOM_DIR/initrd/initrd.cpio efi_root/
 
-        mkimg --config=$SOURCES_DIR/support/mkimg_ember.toml
+        mkimg \
+            --protective-mbr \
+            --dest ember.img \
+            --partition type=fs:name=ESP:gpt-type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B:fs-type=fat32:fs-size=128:fs-root=${BUILD_DIR}/efi_root
+
+
     </sh>
     install: <sh>install ember.img $INSTALL_DIR</sh>
 }

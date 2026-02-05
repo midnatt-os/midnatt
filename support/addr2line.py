@@ -13,8 +13,12 @@ if len(sys.argv) < 2:
 
 address = int(sys.argv[1], 16)
 
-subprocess.run([
-    "addr2line", "-fai",
-    "-e", os.path.join(chariot_utils.path("package/init"), "usr/bin/init"),
-    hex(address)
-])
+subprocess.run(
+    [
+        "addr2line",
+        "-fai",
+        "-e",
+        os.path.join(chariot_utils.path("package/ember"), "sys/bin/ember"),
+        hex(address),
+    ]
+)

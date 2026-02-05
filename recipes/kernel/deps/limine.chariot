@@ -1,0 +1,11 @@
+source/limine_proto {
+    url: "https://codeberg.org/Limine/Limine-protocol.git"
+    type: "git"
+    revision: "trunk"
+}
+
+source/limine_binary {
+    url: "https://codeberg.org/Limine/Limine.git"
+    type: "git"
+    revision: "v10.x-binary"
+}
